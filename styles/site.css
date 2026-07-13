@@ -1,0 +1,145 @@
+/*
+ * site.css — glue layer between the reference stylesheets and the React app.
+ *
+ * The look comes from styles/reference/ (normalize.css, skeleton.css,
+ * custom.css). normalize.css and skeleton.css are imported verbatim in
+ * main.jsx. custom.css is NOT imported globally on purpose: its bare
+ * `label { position: absolute; ... }` and `input { display: none; ... }`
+ * rules exist to build its toggle switch, and applied globally they would
+ * hide every slider in the widgets. The pieces of custom.css this site
+ * uses are reproduced here, scoped, with the source rule cited.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap');
+
+/* custom.css `:root` */
+:root {
+  --light: #d8dbe0;
+  --dark: #28292c;
+  --link: rgb(27, 129, 112);
+  --link-hover: rgb(24, 94, 82);
+  --accent: #33C3F0;          /* skeleton.css .button-primary */
+  --navbar: rgb(108, 159, 213); /* custom.css .navbar background */
+}
+
+/* custom.css `* { padding: 0; margin: 0; box-sizing: border-box; }` */
+* { padding: 0; margin: 0; box-sizing: border-box; }
+
+/* custom.css: `html { background-color: #242424 }`, `body { color: #cccccc }`.
+   Font family per skeleton.css base styles (Raleway). */
+html { background-color: #242424; }
+body {
+  color: #cccccc;
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* custom.css link colors (its commented-out `a` block's palette) */
+a { color: var(--link); }
+a:hover { color: var(--link-hover); }
+
+/* custom.css `.docs-header` — used for the site title */
+.docs-header {
+  text-transform: uppercase;
+  font-size: 1.65rem;
+  letter-spacing: .2rem;
+  font-weight: 600;
+}
+
+/* custom.css `.navbar` / `.navbar-link` — chapter nav bar */
+.site-navbar {
+  background: var(--navbar);
+  border-bottom: 1px solid #eee;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  align-items: center;
+}
+.site-navbar button {
+  text-transform: uppercase;   /* .navbar-link */
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .2rem;
+  color: #e8eef6;
+  background: transparent;
+  border: none;
+  padding: 14px 15px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.site-navbar button.active { color: var(--accent); } /* custom.css .navbar-link.active */
+
+/* Skeleton gives all buttons a fixed 38px height + 38px line-height; the
+   widgets size their own buttons, so relax that inside the app root. */
+#root button { height: auto; line-height: normal; }
+#root label { margin-bottom: 0; }
+
+/* Range sliders (skeleton doesn't style these) */
+#root input[type=range] {
+  -webkit-appearance: none;
+  background: #3d3e42;
+  border-radius: 4px;
+  outline: none;
+  height: 4px;
+  margin-bottom: 0;
+}
+#root input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: currentColor;
+  cursor: pointer;
+}
+
+::selection { background: rgba(51, 195, 240, 0.30); }
+
+/* ---------------------------------------------------------------------------
+ * The light/dark toggle switch — a scoped copy of the switch in custom.css
+ * (`label`, `label:after`, `input:checked + label:after`, `.toggle-container`).
+ * ------------------------------------------------------------------------- */
+.toggle-container {
+  position: relative;
+  height: 22px;
+  width: 44px;
+  flex: 0 0 auto;
+}
+.toggle-container input {
+  position: absolute;
+  display: none;
+  width: 0; height: 0;
+  visibility: hidden;
+}
+#root .toggle-container label {
+  position: absolute;
+  width: 40px; height: 20px;
+  left: 1px; top: 50%;
+  transform: translateY(-50%);
+  display: block;
+  background-color: var(--dark);
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: inset 0px 5px 15px rgba(0,0,0,.4), inset 0px -5px 15px rgba(255,255,255,.4);
+}
+#root .toggle-container label:after {
+  content: "";
+  width: 18px; height: 18px;
+  position: absolute;
+  top: 1px; left: 1px;
+  background: linear-gradient(180deg, #5a7db8, #486c9a);
+  border-radius: 20px;
+  box-shadow: inset 0px 5px 10px rgba(0,0,0,.2);
+}
+#root .toggle-container input:checked + label:after {
+  left: 3px;
+  transform: translateX(100%);
+  background: linear-gradient(180deg, #ffeb3b, #ffc107);
+}
+#root .toggle-container label,
+#root .toggle-container label:after { transition: 0.3s; }
+
+/* ---------------------------------------------------------------------------
+ * Light mode — same filter trick custom.css uses for SVGs
+ * (`img[src$=".svg"] { filter: invert(1) hue-rotate(180deg) }`), applied to
+ * the whole app so the inline-styled dark widgets flip to light together.
+ * ------------------------------------------------------------------------- */
+body.light-mode { background-color: #ffffff; }
+body.light-mode #root { filter: invert(1) hue-rotate(180deg); }
