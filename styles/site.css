@@ -18,8 +18,9 @@
   --dark: #28292c;
   --link: rgb(27, 129, 112);
   --link-hover: rgb(24, 94, 82);
-  --accent: #33C3F0;          /* skeleton.css .button-primary */
-  --navbar: rgb(108, 159, 213); /* custom.css .navbar background */
+  --accent: #33C3F0;            /* custom.css .navbar-link.active / skeleton .button-primary */
+  --navbar: rgb(108, 159, 213); /* custom.css .navbar background — the blue bar */
+  --navbar-link: #cccccc;       /* custom.css desktop .navbar-link color */
 }
 
 /* custom.css `* { padding: 0; margin: 0; box-sizing: border-box; }` */
@@ -45,12 +46,28 @@ a:hover { color: var(--link-hover); }
   font-weight: 600;
 }
 
-/* custom.css `.navbar` / `.navbar-link` — chapter nav bar */
+/* ---------------------------------------------------------------------------
+ * Chapter nav — custom.css `.navbar` / `.navbar-link`.
+ * On your site the navbar is `position: fixed` at the very top, with the
+ * title BELOW it; we mirror that with `position: sticky` (stays put on scroll)
+ * and by rendering the nav before the title in the DOM.
+ * ------------------------------------------------------------------------- */
 .site-navbar {
+  position: sticky;              /* custom.css .navbar { position: fixed } */
+  top: 0;
+  z-index: 50;                   /* sit above the (filtered) content on scroll */
   background: var(--navbar);
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(0,0,0,.15);
   display: flex;
   gap: 0;
+  align-items: center;
+}
+/* The chapter buttons scroll horizontally; the toggle stays pinned at the
+   right so it's always reachable (custom.css .navbar-item:last-child). */
+.site-navbar .nav-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-x: auto;
   align-items: center;
 }
@@ -59,7 +76,7 @@ a:hover { color: var(--link-hover); }
   font-size: 11px;
   font-weight: 600;
   letter-spacing: .2rem;
-  color: #e8eef6;
+  color: var(--navbar-link);   /* custom.css .navbar-link { color: #cccccc } */
   background: transparent;
   border: none;
   padding: 14px 15px;
@@ -67,6 +84,8 @@ a:hover { color: var(--link-hover); }
   white-space: nowrap;
 }
 .site-navbar button.active { color: var(--accent); } /* custom.css .navbar-link.active */
+/* pushes the toggle to the right end of the bar — custom.css .navbar-item:last-child { margin-left:auto } */
+.site-navbar .nav-spacer { margin-left: auto; }
 
 /* Skeleton gives all buttons a fixed 38px height + 38px line-height; the
    widgets size their own buttons, so relax that inside the app root. */
@@ -95,12 +114,15 @@ a:hover { color: var(--link-hover); }
 /* ---------------------------------------------------------------------------
  * The light/dark toggle switch — a scoped copy of the switch in custom.css
  * (`label`, `label:after`, `input:checked + label:after`, `.toggle-container`).
+ * It lives in the navbar, which is OUTSIDE the light-mode filter below, so its
+ * yellow (#ffeb3b→#ffc107, exactly custom.css's) renders true in both modes.
  * ------------------------------------------------------------------------- */
 .toggle-container {
   position: relative;
   height: 22px;
   width: 44px;
   flex: 0 0 auto;
+  margin: 0 16px 0 4px;
 }
 .toggle-container input {
   position: absolute;
@@ -108,7 +130,7 @@ a:hover { color: var(--link-hover); }
   width: 0; height: 0;
   visibility: hidden;
 }
-#root .toggle-container label {
+.toggle-container label {
   position: absolute;
   width: 40px; height: 20px;
   left: 1px; top: 50%;
@@ -119,7 +141,7 @@ a:hover { color: var(--link-hover); }
   cursor: pointer;
   box-shadow: inset 0px 5px 15px rgba(0,0,0,.4), inset 0px -5px 15px rgba(255,255,255,.4);
 }
-#root .toggle-container label:after {
+.toggle-container label:after {
   content: "";
   width: 18px; height: 18px;
   position: absolute;
@@ -128,18 +150,23 @@ a:hover { color: var(--link-hover); }
   border-radius: 20px;
   box-shadow: inset 0px 5px 10px rgba(0,0,0,.2);
 }
-#root .toggle-container input:checked + label:after {
+.toggle-container input:checked + label:after {
   left: 3px;
   transform: translateX(100%);
-  background: linear-gradient(180deg, #ffeb3b, #ffc107);
+  background: linear-gradient(180deg, #ffeb3b, #ffc107); /* custom.css checked knob */
 }
-#root .toggle-container label,
-#root .toggle-container label:after { transition: 0.3s; }
+.toggle-container label,
+.toggle-container label:after { transition: 0.3s; }
 
 /* ---------------------------------------------------------------------------
- * Light mode — same filter trick custom.css uses for SVGs
- * (`img[src$=".svg"] { filter: invert(1) hue-rotate(180deg) }`), applied to
- * the whole app so the inline-styled dark widgets flip to light together.
+ * Light mode.
+ * custom.css flips SVGs with `filter: invert(1) hue-rotate(180deg)`. We apply
+ * the same to the CONTENT region only (`.app-body`), NOT to the whole app, so:
+ *   - the blue navbar stays blue and the toggle stays yellow (they're siblings
+ *     of .app-body, not inside it), and
+ *   - `position: sticky` on the navbar keeps working (a filtered ANCESTOR would
+ *     break sticky; a filtered sibling doesn't).
+ * The title lives inside .app-body, so it flips to light along with the content.
  * ------------------------------------------------------------------------- */
 body.light-mode { background-color: #ffffff; }
-body.light-mode #root { filter: invert(1) hue-rotate(180deg); }
+body.light-mode .app-body { filter: invert(1) hue-rotate(180deg); }

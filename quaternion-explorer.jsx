@@ -561,38 +561,39 @@ export default function QuaternionExplorer() {
   useEffect(() => { document.body.classList.toggle("light-mode", light); }, [light]);
 
   return (
-    <div style={{ minHeight: "100vh", background: COLORS.bg, color: COLORS.text }}>
+    <div style={{ minHeight: "100vh", color: COLORS.text }}>
       <style>{`button:hover { filter: brightness(1.12); }`}</style>
 
-      {/* Header — .docs-header style from styles/reference/custom.css */}
-      <header style={{
-        padding: "26px 24px 20px", borderBottom: `1px solid ${COLORS.border}`,
-        background: COLORS.surface, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
-      }}>
-        <div style={{ flex: "1 1 auto" }}>
+      {/* Sticky nav on top, toggle pinned at its right end — mirrors the fixed
+          navbar on jeremydwong.github.io. The title sits BELOW it, in .app-body. */}
+      <nav className="site-navbar">
+        <div className="nav-scroll">
+          {chapterData.map((c, i) => (
+            <button key={i} className={i === chapter ? "active" : ""} onClick={() => setChapter(i)}
+              style={{ borderBottom: `3px solid ${i === chapter ? "#33C3F0" : "transparent"}` }}>
+              {c.num}. {c.title}
+            </button>
+          ))}
+        </div>
+        <div className="toggle-container">
+          <input id="theme-toggle" type="checkbox" checked={light} onChange={(e) => setLight(e.target.checked)} />
+          <label htmlFor="theme-toggle" aria-label="Toggle light mode" />
+        </div>
+      </nav>
+
+      {/* Content region — the only part that flips in light mode (keeps the
+          blue navbar + yellow toggle true, and keeps the navbar sticky). */}
+      <div className="app-body">
+        <header style={{
+          padding: "26px 24px 20px", borderBottom: `1px solid ${COLORS.border}`, background: COLORS.surface,
+        }}>
           <h1 className="docs-header" style={{ color: COLORS.text, fontSize: "2rem", margin: 0 }}>
             Quaternions <span style={{ color: COLORS.cyan }}>for Simulation</span>
           </h1>
           <div style={{ fontSize: 13.5, color: COLORS.muted, marginTop: 4 }}>
             the five operations you need to rotate things — and the one equation to simulate them
           </div>
-        </div>
-        {/* light/dark switch — the custom.css toggle */}
-        <div className="toggle-container">
-          <input id="theme-toggle" type="checkbox" checked={light} onChange={(e) => setLight(e.target.checked)} />
-          <label htmlFor="theme-toggle" aria-label="Toggle light mode" />
-        </div>
-      </header>
-
-      {/* Chapter nav — .navbar style from styles/reference/custom.css */}
-      <nav className="site-navbar">
-        {chapterData.map((c, i) => (
-          <button key={i} className={i === chapter ? "active" : ""} onClick={() => setChapter(i)}
-            style={{ borderBottom: `3px solid ${i === chapter ? "#33C3F0" : "transparent"}` }}>
-            {c.num}. {c.title}
-          </button>
-        ))}
-      </nav>
+        </header>
 
       <main style={{ maxWidth: 820, margin: "0 auto", padding: "26px 20px 52px" }}>
         <div style={{ marginBottom: 14 }}>
@@ -609,6 +610,7 @@ export default function QuaternionExplorer() {
             style={{ ...btnStyle, opacity: chapter === chapterData.length - 1 ? 0.3 : 1, background: ch.color + "22", borderColor: ch.color + "55", color: ch.color }}>Next →</button>
         </div>
       </main>
+      </div>
     </div>
   );
 }
