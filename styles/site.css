@@ -31,6 +31,7 @@
 html { background-color: #242424; }
 body {
   color: #cccccc;
+  background: transparent;   /* let html's background show through (index.html sets a dark body bg capped to one viewport by height:100%) */
   font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -61,26 +62,33 @@ a:hover { color: var(--link-hover); }
   display: flex;
   gap: 0;
   align-items: center;
+  justify-content: center;   /* centre the tabs+toggle group instead of stretching it edge-to-edge */
 }
 /* The chapter buttons scroll horizontally; the toggle stays pinned at the
    right so it's always reachable (custom.css .navbar-item:last-child). */
 .site-navbar .nav-scroll {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto;            /* don't grow — so the toggle sits right after the tabs and the group can centre */
   min-width: 0;
   overflow-x: auto;
   align-items: center;
+  scrollbar-width: none;         /* Firefox: hide the horizontal scrollbar */
+  -ms-overflow-style: none;      /* old Edge */
 }
+.site-navbar .nav-scroll::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 .site-navbar button {
-  margin: 0;
-  text-transform: uppercase;
+  margin: 0;                   /* cancel Skeleton's `button { margin-bottom: 1rem }` so the label centers vertically */
+  text-transform: uppercase;   /* .navbar-link */
   font-size: 11px;
   font-weight: 600;
   letter-spacing: .2rem;
   color: var(--navbar-link);   /* custom.css .navbar-link { color: #cccccc } */
   background: transparent;
   border: none;
-  padding: 14px 15px;
+  min-height: 6.5rem;      /* match the 6.5rem (~65px) navbar on jeremydwong.github.io (min-height so #root button{height:auto} can't override it) */
+  display: flex;
+  align-items: center;     /* vertically centre the label in the taller bar */
+  padding: 0 15px;
   cursor: pointer;
   white-space: nowrap;
 }
